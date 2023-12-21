@@ -10,12 +10,12 @@ class Employee extends Model
     use HasFactory;
 
     protected $table = 'employees';
-
+    protected $primaryKey = 'id';
     protected $fillable = [
-        'profil_penerima_id',
+        'name',
         'job_title',
         'address',
         'department' 
     ];
-    
+
 }

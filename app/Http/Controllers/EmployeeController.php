@@ -6,17 +6,19 @@ use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Expr\Empty_;
 
 class EmployeeController extends Controller
 {
 
     public function index()
     {
-        $this->data['employees'] = Employee::all();
-        if ($this->data['employees']->count() > 0) {
-            return response()->json(['message' => 'success', 'data' => $this->data], 200);
-        }
-        return response()->json(['message' => 'Empty data'], 400);
+        return response()->json([
+            'message' => 'Data',
+            'code' => 200,
+            'error' => false,
+            'data' =>  Employee::orderBy('name', 'asc')->get()
+        ], 200);
     }
 
     public function validator(array $data)
@@ -57,20 +59,19 @@ class EmployeeController extends Controller
 
     public function show(string $id)
     {
-        $this->data['employees'] = Employee::find($id);
-        if ($this->data['employees']) {
-            return response()->json(['message' => 'Success get data', 'data' => $this->data], 200);
-        }
-        return response()->json(['message' => 'Failed, Data  not found'], 400);
+        $employee = Employee::find($id);
+        if(!$employee) return response()->json(['message' => 'No data found'], 404);
+
+        return response()->json([
+            'message' => 'Data detail',
+            'code' => 200,
+            'error' => false,
+            'results' => $employee
+        ], 200);
     }
 
     public function update(Request $request, string $id)
     {
-        $validator = $this->validator($request->all());
-        if ($validator->fails()) {
-            return response()->json(['message' => $validator->errors()], 422);
-        }
-
         DB::beginTransaction();
         try {
             $employee = Employee::find($id);
